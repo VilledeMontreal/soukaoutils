@@ -1,0 +1,52 @@
+@model Newtonsoft.Json.Linq.JArray
+
+<div class="jumbotron">
+    @if (User?.Identity?.IsAuthenticated ?? false) {
+        <h1>Welcome, @User.Identity.Name</h1>
+
+        <p>
+            @foreach (var claim in Context.User.Claims) {
+                <div>@claim.Type: <b>@claim.Value</b></div>
+            }
+        </p>
+
+
+        <a class="btn btn-lg btn-danger" href="/logout">Sign out</a>
+
+        <form action="~/" method="post">
+            <button class="btn btn-lg btn-warning" type="submit">Query the resource controller</button>
+        </form>
+
+        <form action="Add" method="post">
+            <button class="btn btn-lg btn-warning" type="submit">Ajouter outil</button>
+        </form>
+
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+
+        <form action="Clear" method="post">
+            <button class="btn btn-lg btn-warning" style="color: red;" type="submit">Supprimer tous les items</button>
+        </form>
+
+        if (Model != null) {
+            <h3>Message received from the resource controller:</h3>
+            <div>Count: <b>@Model.Count</b></div>
+            <p>
+                <ul>
+                @foreach (var item in @Model) {
+                    <li>@item["userName"]->@item</li>
+                }
+                </ul>
+            </p>
+            //@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model, Newtonsoft.Json.Formatting.Indented))
+        }
+    }
+
+    else {
+        <h1>Welcome, anonymous</h1>
+        <a class="btn btn-lg btn-success" href="/login">Sign in</a>
+    }
+</div>
