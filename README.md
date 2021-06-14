@@ -22,6 +22,19 @@ A user is asked to authenticate with the identity server. The identity server is
 -	The client application is granted the required scope
 -	The user initiating the request has the required role(s)
 
+### Installation
+Clone the repository and run the follwoing commands:
+```
+dotnet restore 
+dotnet run
+```
+Create the ASP.Net Core Identity tables in the database:
+```
+dotnet ef migrations add initial_migration
+dotnet ef database update
+
+```
+
 ### License
 
 The source code of this project is distributed under the [MIT License](LICENSE).
@@ -40,22 +53,35 @@ ______________________
 
 <a id='french-version' class='anchor' aria-hidden='true'/>
 
-# Gabarit pour dépôts de code source libre de la Ville de Montréal
+# Soukaoutils
+Soukaoutils est une application de partage d’outils. Un utilisateur peut afficher ses outils pour location et préciser le montant à payer par jour.
 
-## Gabarit pour README.md
+## OAuth 2.0 et OIDC
 
-Description du projet
+Le service de partage est assuré par trois composants :
+-	Un serveur d’autorisation
+-	Un serveur de ressources disponibles comme service API
+-	Un portail client pour gérer les locations 
+
+Le serveur d’autorisation reconnait les identités de plusieurs fournisseurs. Il est aussi extensible pour accepter n’importe quel autre fournisseur qui implémente le protocole OIDC. Il permet aussi de définir les rôles des utilisateurs et les scopes des applications clientes. Les identités des fournisseurs externes sont associées à une identité locale construite avec l’identité ASP.Net Core.
 
 ### Détails
 
-- Comment fonctionne le produit?
-- À qui s'adresse le produit?
-
-### Bâtir
+Un utilisateur sera redirigé vers le serveur d’autorisation pour acquérir un code d’autorisation. Le code sera par la suite échangé contre un jeton d’accès incluant les scopes nécessaire pour l’accès à une ressource donnée. Les rôles de l’utilisateur qui a initié l’appel seront aussi ajoutés au jeton d’accès.
+Le jeton d’accès est envoyé au serveur de ressource qui en fait l’introspection et valide que le scope est accessible au client et l’utilisateur détient les rôles requis avant de générer la réponse.
 
 ### Installer
+Copier le dépôt et exécuter les commandes:
+```
+dotnet restore 
+dotnet run
+```
+Créer et initier la base de données:
+```
+dotnet ef migrations add initial_migration
+dotnet ef database update
 
-### Tester
+```
 
 ### Contribuer
 
