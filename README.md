@@ -2,22 +2,25 @@
 
 <a id='english-version' class='anchor' aria-hidden='true'/>
 
-# Template for open source code repositories of the Ville de Montréal
+# Soukaoutils
+Soukaoutils is a tools sharing space where users can let out any of their belongings for a stated daily fee. A registered member can reserve a tool for any period of time when the tool is available.
 
-## Template for README.md
+## OAuth 2.0 and OIDC
 
-- Project description
+The application is composed of three components:
+-	An authorization server
+-	A resources server
+-	A relying party (RP)
+
+The authorization server allows for any type of authentication that implements OIDC. It also provides its own OIDC authentication and OAuth 2.0 authorization flows. The identity itself along with the applications roles are provided using ASP.Net Core Identity. 
+
 
 ### Details
 
-- How does it work?
-- Who will use this project?
-
-### Build
-
-### Installation
-
-### Testing
+A user is asked to authenticate with the identity server. The identity server issues an authorization code which the client application can after that exchange for an access token. Scopes required to access a given resource and roles of the current user are added to the access token. When the token is sent over to the resource server, and before any response is prepared, the token will be introspected and validated to ensure that: 
+-	It is a valid token
+-	The client application is granted the required scope
+-	The user initiating the request has the required role(s)
 
 ### License
 
