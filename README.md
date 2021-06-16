@@ -12,8 +12,6 @@ The application is composed of three components:
 -	A resources server
 -	A relying party (RP)
 
-![Image of OAuth 2.0](https://github.com/VilledeMontreal/soukaoutils/raw/master/OAuth20-MeC.GIF)
-
 The authorization server allows for any type of authentication that implements OIDC. It also provides its own OIDC authentication and OAuth 2.0 authorization flows. The identity itself along with the applications roles are provided using ASP.Net Core Identity. 
 
 
@@ -64,6 +62,8 @@ Le service de partage est assuré par trois composants :
 -	Un serveur d’autorisation
 -	Un serveur de ressources disponibles comme service API
 -	Un portail client pour gérer les locations 
+
+![Image of OAuth 2.0](https://github.com/VilledeMontreal/soukaoutils/raw/master/OAuth20-MeC.GIF)
 
 Le serveur d’autorisation reconnait les identités de plusieurs fournisseurs. Il est aussi extensible pour accepter n’importe quel autre fournisseur qui implémente le protocole OIDC. Il permet aussi de définir les rôles des utilisateurs et les scopes des applications clientes. Les identités des fournisseurs externes sont associées à une identité locale construite avec l’identité ASP.Net Core.
 
