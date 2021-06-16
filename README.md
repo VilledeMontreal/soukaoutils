@@ -12,6 +12,8 @@ The application is composed of three components:
 -	A resources server
 -	A relying party (RP)
 
+![Image of OAuth 2.0](https://github.com/VilledeMontreal/soukaoutils/raw/master/OAuth20-MeC.GIF)
+
 The authorization server allows for any type of authentication that implements OIDC. It also provides its own OIDC authentication and OAuth 2.0 authorization flows. The identity itself along with the applications roles are provided using ASP.Net Core Identity. 
 
 
