@@ -30,5 +30,7 @@ namespace AuthClient.Controllers
                 authenticationSchemes: OpenIdConnectDefaults.AuthenticationScheme
             );            
         }
+
+
     }
 }

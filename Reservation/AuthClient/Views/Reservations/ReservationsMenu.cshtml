@@ -1,0 +1,79 @@
+@model Newtonsoft.Json.Linq.JArray
+
+<body>
+    @if (User?.Identity?.IsAuthenticated ?? false)
+    {
+        <br>
+
+        <h3>Message received from the resource controller:</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Id
+                    </th>
+                    <th>
+                        UserId
+                    </th>
+                    <th>
+                        ItemId
+                    </th>
+                    <th>
+                        StartDate
+                    </th>
+                    <th>
+                        EndDate
+                    </th>
+                    <th>
+                        Created
+                    </th>
+                    <th>
+                        Cancelled
+                    </th>
+                </tr>
+            </thead>
+            @if (Model != null)
+            {
+                <div>Count: <b>@Model.Count</b></div>
+                <tbody>
+                    @foreach (var reservation in @Model)
+                    {
+                        <tr>
+                            <td>
+                                @reservation["id"]
+                            </td>
+                            <td>
+                                @reservation["userId"]
+                            </td>
+                            <td>
+                                @reservation["itemId"]
+                            </td>
+                            <td>
+                                @reservation["startDate"]
+                            </td>
+                            <td>
+                                @reservation["endDate"]
+                            </td>
+                            <td>
+                                @reservation["created"]
+                            </td>
+                            <td>
+                                @reservation["cancelled"]
+                            </td>
+
+                            <td>
+                                <a asp-action="Cancel" asp-route-id="@reservation["id"]">Annuler</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            }
+        </table>
+    }
+
+    else
+    {
+        <h1>Please log in</h1>
+        <a class="btn btn-lg btn-success" href="/login">Sign in</a>
+    }
+</body>

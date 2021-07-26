@@ -1,0 +1,18 @@
+@model AccessDeniedViewModel
+@{
+    ViewData["Title"] = "Access Denied";
+}
+<h1 class="text-danger">@Model.Title</h1>
+
+<h4 class="text-danger">An error occurred while processing your request.</h4>
+<h5 class="text-danger">@Model.APIResourceUrl</h5>
+
+<p>You might need to change your consent to include the required scopes for the requested resources.</p>
+
+@Html.ActionLink("Change granted consents", "ChangeConsent", "Items", new { redirectUrl = "/Items" }, null)
+@if (Model.Exception != null)
+{
+    <p>
+        <div><strong>Exception:</strong> <code>@Model.Exception</code> </div>
+    </p>
+}

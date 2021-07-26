@@ -34,6 +34,7 @@ namespace ReservationAPI.Models
         {
             Created = DateTime.Now;
             Modified = DateTime.Now;
+            Withdrawn = false;
         }
     }
 }

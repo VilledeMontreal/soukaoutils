@@ -7,16 +7,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
+using Microsoft.Extensions.Configuration;
+using System.Globalization;
 
 namespace WebIdentity
 {
     public class Worker : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IConfiguration _configuration;
 
-        public Worker(IServiceProvider serviceProvider)
-        {
+        public Worker(IServiceProvider serviceProvider, IConfiguration configuration)
+        {            
             _serviceProvider = serviceProvider;
+            _configuration = configuration;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -68,15 +72,15 @@ namespace WebIdentity
                 {
                     ClientId = "mvc",
                     ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
-                    //ConsentType = ConsentTypes.Explicit,
-                    DisplayName = "MVC client application",
+                    ConsentType = ConsentTypes.Explicit,
+                    DisplayName = "SoukAOutils",
                     PostLogoutRedirectUris =
                     {
-                        new Uri("https://localhost:5002/signout-callback-oidc")
+                        new Uri(_configuration["Variables:Client_URL"] + "/signout-callback-oidc")
                     },
                     RedirectUris =
                     {
-                        new Uri("https://localhost:5002/signin-oidc")
+                        new Uri(_configuration["Variables:Client_URL"] + "/signin-oidc")
                     },
                     Permissions =
                     {
@@ -89,8 +93,9 @@ namespace WebIdentity
                         Permissions.Scopes.Email,
                         Permissions.Scopes.Profile,
                         Permissions.Scopes.Roles,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + "api",
+                        OpenIddictConstants.Permissions.Prefixes.Scope + "trips",
                         OpenIddictConstants.Permissions.Prefixes.Scope + "roles",
+                        OpenIddictConstants.Permissions.Prefixes.Scope + "reservations",
                         OpenIddictConstants.Permissions.Prefixes.Scope + "role",
                     }/* ,
                     Requirements =
@@ -99,6 +104,46 @@ namespace WebIdentity
                     } */
                 }, cancellationToken);
             }
+            
+            await RegisterScopesAsync(scope.ServiceProvider);
+            static async Task RegisterScopesAsync(IServiceProvider provider)
+            {
+                var manager = provider.GetRequiredService<IOpenIddictScopeManager>();
+
+                if (await manager.FindByNameAsync("demo_api") is null)
+                {
+                    await manager.CreateAsync(new OpenIddictScopeDescriptor
+                    {
+                        DisplayName = "Demo API access",
+                        DisplayNames =
+                        {
+                            [CultureInfo.GetCultureInfo("fr-FR")] = "Accès à l'API de démo"
+                        },
+                        Name = "demo_api",
+                        Resources =
+                        {
+                            "resource_server"
+                        }
+                    });
+                }
+                if (await manager.FindByNameAsync("reservations") is null)
+                {
+                    await manager.CreateAsync(new OpenIddictScopeDescriptor
+                    {
+                        DisplayName = "Reservations Access",
+                        DisplayNames =
+                        {
+                            [CultureInfo.GetCultureInfo("fr-FR")] = "Accès aux réservations"
+                        },
+                        Name = "reservations",
+                        Resources =
+                        {
+                            "SoukAOutilsReservations"
+                        }
+                    });
+                }
+
+            }     
             
         }
 

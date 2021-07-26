@@ -14,12 +14,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using static OpenIddict.Abstractions.OpenIddictConstants;
-using Microsoft.AspNetCore.Identity.UI.Services;
+//using Microsoft.AspNetCore.Identity.UI.Services;
 using WebIdentity.Models;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using WebIdentity.Services;
 
 namespace WebIdentity
 {
@@ -73,7 +74,7 @@ namespace WebIdentity
                  })
                 .AddOpenIdConnect("oidc", "Identité Ville", options =>
                 {
-                    options.Authority = "https://localhost:5003";
+                    options.Authority = Configuration["Variables:VDM_Authority"];
 
                     options.ClientId = "mvc";
                     options.ClientSecret = "secret";
@@ -102,15 +103,27 @@ namespace WebIdentity
             
             services.AddDbContext<ApplicationDbContext>(options =>
                 {
-                    options.UseSqlite(
-                                        Configuration.GetConnectionString("DefaultConnection"));
+                    //options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+                    options.UseSqlServer(Configuration.GetConnectionString("MSSQLConnection"));                                        
                     options.UseOpenIddict();
                 });
             
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            // Configure Identity to use the same JWT claims as OpenIddict instead
+            // of the legacy WS-Federation claims it uses by default (ClaimTypes),
+            // which saves you from doing the mapping in your authorization controller.
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.ClaimsIdentity.UserNameClaimType = Claims.Name;
+                options.ClaimsIdentity.UserIdClaimType = Claims.Subject;
+                options.ClaimsIdentity.RoleClaimType = Claims.Role;
+            });
+
             services.AddControllersWithViews();
             services.AddRazorPages();
             
@@ -149,7 +162,7 @@ namespace WebIdentity
                         options.RegisterScopes(
                             Scopes.Profile,
                             Scopes.Email, 
-                            "api", "api1", "roles", "role");
+                            "trips", "api1", "roles", "role","reservations","permis","Coucou");
 
                         // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                         options
@@ -160,7 +173,8 @@ namespace WebIdentity
                             .EnableUserinfoEndpointPassthrough();    
 
                     });
-                services.AddSingleton<IEmailSender, EmailSender>();
+                //services.AddSingleton<IEmailSender, EmailSender>();
+                services.AddTransient<IEmailSender, AuthMessageSender>();
                 services.AddHostedService<Worker>();            
         }
 

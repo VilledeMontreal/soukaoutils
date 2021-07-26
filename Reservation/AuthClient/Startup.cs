@@ -6,13 +6,33 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace AuthClient
 {
     public class Startup
     {
-        public void ConfigureServices(IServiceCollection services)
+        public Startup(IWebHostEnvironment env)
         {
+           var builder = new ConfigurationBuilder();
+           builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
+            Configuration = builder.Build();     
+        }
+
+        public IConfiguration Configuration { get; }
+
+        public void ConfigureServices(IServiceCollection services)
+        {            
+            IdentityModelEventSource.ShowPII = true;
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -28,9 +48,9 @@ namespace AuthClient
             {
                 // Note: these settings must match the application details
                 // inserted in the database at the server level.
-                options.ClientId = "mvc";
-                options.ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654";
-                options.SignedOutRedirectUri = "https://localhost:5002/";
+                options.ClientId = Configuration["Variables:ClientId"];
+                options.ClientSecret = Configuration["Variables:ClientSecret"];
+                options.SignedOutRedirectUri = Configuration["Variables:SignedOutRedirectUri"];
 
                 options.RequireHttpsMetadata = false;
                 options.GetClaimsFromUserInfoEndpoint = true;
@@ -43,20 +63,33 @@ namespace AuthClient
                 // Note: setting the Authority allows the OIDC client middleware to automatically
                 // retrieve the identity provider's configuration and spare you from setting
                 // the different endpoints URIs or the token validation parameters explicitly.
-                options.Authority = "https://localhost:5001/";
+                options.Authority = Configuration["Variables:Authority"];
 
                 //options.Scope.Add("email");
                 options.Scope.Add("roles");
+                options.Scope.Add("reservations");
+                options.Scope.Add("permis");
+                options.Scope.Add("trips");
 
-                options.SecurityTokenValidator = new JwtSecurityTokenHandler
+                /* options.SecurityTokenValidator = new JwtSecurityTokenHandler
                 {
                     // Disable the built-in JWT claims mapping feature.
                     InboundClaimTypeMap = new Dictionary<string, string>()
                 };
-
+ */
                 options.TokenValidationParameters.NameClaimType = "name";
                 options.TokenValidationParameters.RoleClaimType = "role";
             });
+
+            // Add authorization to validate the scopes before sending requests to APIs
+            services.AddAuthorization(options =>
+                {
+                    options.AddPolicy("ApiScope", policy =>
+                    {
+                        policy.RequireAuthenticatedUser();
+                        //policy.RequireClaim("scope", "roles");
+                    });
+                });
 
             services.AddControllersWithViews();
 
@@ -76,7 +109,7 @@ namespace AuthClient
 
             app.UseEndpoints(options =>
             {
-                options.MapControllers();
+                options.MapControllers();//.RequireAuthorization("ApiScope");
                 options.MapDefaultControllerRoute();
             });
         }

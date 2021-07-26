@@ -1,0 +1,261 @@
+﻿@model AuthClient.Models.ItemViewModel
+
+<body>
+    @if (User?.Identity?.IsAuthenticated ?? false)
+    {
+        <br>
+        <a data-toggle="modal" href="#addItemModal" class="btn btn-lg btn-success">Ajouter un item</a>
+        <br>
+        <br>
+        <br>
+
+        <div class="modal fade" id="addItemModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <form asp-action="Add" style="text-align: center">
+                            <div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Title</span>
+                                    </div>
+                                    <input autocomplete="off" type="text" class="form-control" aria-label="Small"
+                                           aria-describedby="inputGroup-sizing-sm" name="title">
+                                </div>
+                            </div>
+                            <div>
+                                <select class="mb-3" aria-label="Default select example" style="width: 100%;
+                                border-radius: .2rem; color: #495057; border-color: #495057" name="itemTypeId">
+                                    <option selected style="color: #495057">Item Type Id</option>
+
+                                    @foreach (KeyValuePair<int, String> pair in @Model.ItemTypes)
+                                    {
+                                        <option value="@pair.Key" style="color: #495057">@pair.Value</option>
+                                    }
+                                </select>
+                            </div>
+                            <div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Description</span>
+                                    </div>
+                                    <input autocomplete="off" type="text" class="form-control" aria-label="Small"
+                                           aria-describedby="inputGroup-sizing-sm" name="description">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Picture (LEAVE EMPTY)</span>
+                                    </div>
+                                    <input autocomplete="off" type="text" class="form-control" aria-label="Small"
+                                           aria-describedby="inputGroup-sizing-sm" name="picture">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Location</span>
+                                    </div>
+                                    <input autocomplete="off" type="text" class="form-control" aria-label="Small"
+                                           aria-describedby="inputGroup-sizing-sm" name="location">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroup-sizing-sm">Daily Fee</span>
+                                    </div>
+                                    <input autocomplete="off" type="text" class="form-control" aria-label="Small"
+                                           aria-describedby="inputGroup-sizing-sm" name="dailyfee">
+                                </div>
+                            </div>
+                            <button class="btn btn-lg btn-success" type="submit">Ajouter cet item</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Search">
+            <div class="input-group mb-3">
+                <input name="searchString" type="text" class="form-control" placeholder="Search...">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
+        <br>
+
+        <h3>Data received from the resource server:</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Id
+                    </th>
+                    <th>
+                        OwnerId
+                    </th>
+                    <th>
+                        Title
+                    </th>
+                    <th>
+                        Item Type
+                    </th>
+                    <th>
+                        Description
+                    </th>
+                    <th>
+                        Picture
+                    </th>
+                    <th>
+                        Withdrawn
+                    </th>
+                    <th>
+                        Location
+                    </th>
+                    <th>
+                        DailyFee
+                    </th>
+                    <th>
+                        Created
+                    </th>
+                    <th>
+                        Modified
+                    </th>
+                </tr>
+            </thead>
+            @if (Model != null)
+            {
+                <div>Count: <b>@Model.Items.Count</b></div>
+                <tbody>
+                    @foreach (var item in @Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                @item["id"]
+                            </td>
+                            <td>
+                                @item["ownerId"]
+                            </td>
+                            <td>
+                                @item["title"]
+                            </td>
+                            <td>
+                                @Model.ItemTypes[(int)item["itemTypeId"]]
+                            </td>
+                            <td>
+                                @item["description"]
+                            </td>
+                            <td>
+                                @item["picture"]
+                            </td>
+                            <td>
+                                @item["withdrawn"]
+                            </td>
+                            <td>
+                                @item["location"]
+                            </td>
+                            <td>
+                                @item["dailyFee"]
+                            </td>
+                            <td>
+                                @item["created"]
+                            </td>
+                            <td>
+                                @item["modified"]
+                            </td>
+
+                            @if ((bool)item["Mine"])
+                            {
+                                <td>
+                                    @if ((bool)item["withdrawn"])
+                                    {
+                                        <a asp-action="Return" asp-route-id="@item["id"]">Retourner</a>
+                                        <a style="color: grey">Retirer</a>
+                                    }
+                                    else
+                                    {
+                                        <a style="color: grey">Retourner</a>
+                                        <a asp-action="Withdraw" asp-route-id="@item["id"]">Retirer</a>
+                                    }
+                                </td>
+                            }
+                            else if (!(bool)item["withdrawn"])
+                            {
+                                <td>
+                                    <a data-toggle="modal" href="#reserveModal" class="btn btn-lg btn-success">Réserver</a>
+                                    <br>
+                                    <br>
+
+                                    <div class="modal fade" id="reserveModal">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body">
+                                                    <form asp-controller="Reservations" asp-action="Add" asp-route-itemId="@item["id"]" style="text-align: center">
+                                                        <br>
+                                                        <label>Start Date</label>
+                                                        <br>
+                                                        <input id="DateId1" type='text' class="form-control text-center" placeholder="DD MM YYYY" readonly="readonly" name="startDate"/>
+                                                        <script>
+                                                            $('#DateId1').daterangepicker(
+                                                                {
+                                                                    singleDatePicker: true,
+                                                                    timePicker: true,
+                                                                    startDate: moment().startOf('hour'),
+                                                                    endDate: moment().startOf('hour').add(32, 'hour'),
+                                                                    locale: {
+                                                                        format: 'YYYY/MM/DD hh:mm A'
+                                                                    },
+                                                                    opens: "center"
+                                                                });
+                                                        </script>
+                                                        <br>
+                                                        <br>
+
+                                                        <label>End Date</label>
+                                                        <br>
+                                                        <input id="DateId2" type='text' class="form-control text-center" placeholder="DD MM YYYY" readonly="readonly" name="endDate"/>
+                                                        <script>
+                                                            $('#DateId2').daterangepicker(
+                                                                {
+                                                                    singleDatePicker: true,
+                                                                    timePicker: true,
+                                                                    startDate: moment().startOf('hour'),
+                                                                    endDate: moment().startOf('hour').add(32, 'hour'),
+                                                                    locale: {
+                                                                        format: 'YYYY/MM/DD hh:mm A'
+                                                                    },
+                                                                    opens: "center"
+                                                                });
+                                                        </script>
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <button class="btn btn-lg btn-success" type="submit">Réserver</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                            }
+                        </tr>
+                    }
+                </tbody>
+            }
+        </table>
+
+        <form asp-action="Clear">
+            <button class="btn btn-lg btn-danger" type="submit">Supprimer tous les items</button>
+        </form>
+    }
+
+    else
+    {
+        <h1>Please log in</h1>
+        <a class="btn btn-lg btn-success" href="/login">Sign in</a>
+    }
+</body>

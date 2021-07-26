@@ -21,7 +21,7 @@ namespace ReservationAPI.Controllers
     public class ItemsController : ControllerBase
     {
         private ReservationContext aContext;
-        private string[] scopeRequiredByApi = new string[] { "access_as_user" };
+        private string[] scopeRequiredByApi = new string[] { "Reservations" };
 
         public ItemsController(ReservationContext pContext)
         {
@@ -31,26 +31,21 @@ namespace ReservationAPI.Controllers
         [HttpGet]
         public IEnumerable<Item> Get()
         {
-            //return View("Home", model: await response.Content.ReadAsStringAsync());
+            IEnumerable<Item> items = aContext.Items.ToArray();
             return aContext.Items.ToArray();
-            /* return new[] {  new Item
-                    {
-                        Id = 1,
-                        ItemTypeId = 1,
-                        OwnerId = 1,
-                        Created = DateTime.Now,
-                        Withdrawn = false,
-                        Title = "My Ford Focus",
-                        Description = "Nice 2016 model",
-                        Location = "Pierrefonds"
-                    }
-                }; */
+        }
+
+        [HttpGet("getItemTypes")]
+        public IEnumerable<ItemType> GetItemTypes()
+        {
+            IEnumerable<Item> items = aContext.Items.ToArray();
+            return aContext.ItemTypes.ToArray();
         }
 
       [HttpGet("test")]
         public IEnumerable<Item> Test()
         {
-            //HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+            HttpContext.VerifyUserHasAnyAcceptedScope("Reservations");
             return new[] {  new Item
                     {
                         Id = 1,
@@ -68,7 +63,7 @@ namespace ReservationAPI.Controllers
         [HttpGet("search/{searchString}")]
         public IEnumerable<Item> Search(string searchString)
         {
-            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+            //HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
             IQueryable<Item> result = aContext.Items;
             searchString = searchString.ToLower();
 
@@ -80,11 +75,68 @@ namespace ReservationAPI.Controllers
         [HttpGet("withdraw/{ItemId}")]
         public ActionResult Withdraw(int ItemId)
         {
-            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+            //HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
             try
             {
+                // Get the user
+                string username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                User user = aContext.Users.Where(user => user.UserName.Equals(username)).FirstOrDefault();
+
+                // Create the user if he does not exist
+                if (user == null)
+                {
+                    aContext.Users.Add(new Models.User{UserName=username});
+                    aContext.SaveChanges();
+                    user = aContext.Users.Where(u => u.UserName.Equals(username)).FirstOrDefault();
+                }
+
+                // Get the item
                 Item item = aContext.Items.Where(item => item.Id == ItemId).FirstOrDefault();
+
+                // Verify that the user owns this item
+                if (item.OwnerId != user.Id)
+                {
+                    throw new Exception("You do not own this item");
+                }
+
                 item.Withdrawn = true;
+                aContext.SaveChanges();
+                return Ok(item);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.InnerException.Message);
+            }
+        }
+
+        [HttpGet("return/{ItemId}")]
+        public ActionResult Return(int ItemId)
+        {
+            //HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+            try
+            {
+                // Get the user
+                string username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                User user = aContext.Users.Where(user => user.UserName.Equals(username)).FirstOrDefault();
+
+                // Create the user if he does not exist
+                if (user == null)
+                {
+                    aContext.Users.Add(new Models.User{UserName=username});
+                    aContext.SaveChanges();
+                    user = aContext.Users.Where(u => u.UserName.Equals(username)).FirstOrDefault();
+                }
+
+                // Get the item
+                Item item = aContext.Items.Where(item => item.Id == ItemId).FirstOrDefault();
+
+                // Verify that the user owns this item
+                if (item.OwnerId != user.Id)
+                {
+                    throw new Exception("You do not own this item");
+                }
+
+                item.Withdrawn = false;
                 aContext.SaveChanges();
                 return Ok(item);
             }
@@ -110,15 +162,15 @@ namespace ReservationAPI.Controllers
             try
             {
                 // Use the identity of the user making the request to retieve the users items.
-                string userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                string username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
                 // Get the Owner's Id from the users store. Create a new user if it is not already there
-                var owner = aContext.Users.Where(u => u.UserName == userId );
+                var owner = aContext.Users.Where(u => u.UserName.Equals(username));
                 if(owner.FirstOrDefault() == null)
                 {
-                    aContext.Users.Add(new Models.User{UserName=userId});
+                    aContext.Users.Add(new Models.User{UserName=username});
                     aContext.SaveChanges();
-                    owner = aContext.Users.Where(u => u.UserName == userId);
+                    owner = aContext.Users.Where(u => u.UserName.Equals(username));
                 }
                 pItem.OwnerId = owner.FirstOrDefault().Id;
 
@@ -131,12 +183,15 @@ namespace ReservationAPI.Controllers
                 return Problem(e.InnerException.Message);
             }
         }
-        [HttpGet("clear")]
+        
+        [HttpGet("clear"), Authorize(Roles = "Admin")]
         public ActionResult Clear()
         {
             //HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
             try
             {
+                foreach (var reservation in aContext.Reservations)
+                    aContext.Reservations.Remove(reservation);
                 foreach (var item in aContext.Items)
                     aContext.Items.Remove(item);
                 aContext.SaveChanges();
@@ -147,5 +202,35 @@ namespace ReservationAPI.Controllers
                 return Problem(e.InnerException.Message);
             }
         }        
+    
+        //[RequiredScope("Reservations")]
+        [HttpGet("getMyId")]
+        public ActionResult GetMyId()
+        {
+            try
+            {
+                //HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+                Claim? scopeClaim = HttpContext.User.FindFirst("scope");
+                if (scopeClaim == null || !scopeClaim.Value.Split(' ').Contains<string>("Reservations", StringComparer.OrdinalIgnoreCase))
+                {
+                    return Forbid();
+                }
+                string username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                User user = aContext.Users.Where(user => user.UserName.Equals(username)).FirstOrDefault();
+
+                if(user == null)
+                {
+                    aContext.Users.Add(new Models.User{UserName=username});
+                    aContext.SaveChanges();
+                    user = aContext.Users.Where(u => u.UserName.Equals(username)).FirstOrDefault();
+                }
+
+                return Ok(user.Id);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
+        }
     }
 }

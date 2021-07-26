@@ -27,18 +27,19 @@ namespace ReservationAPI
             services.AddDbContext<ReservationContext>(options =>
             {
                 // Configure the context to use Microsoft SQL Server.
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
 
             // Adding the authentication with OAuth 2.0
             services.AddAuthentication("Bearer")
                   .AddJwtBearer("Bearer", options =>
                   {
-                      options.Authority = "https://localhost:5001";
+                      options.Authority = Configuration["Variables:Authority"];
 
                       options.TokenValidationParameters = new TokenValidationParameters
                       {
-                          ValidateAudience = false
+                          ValidateAudience = true,
+                          ValidAudience = "SoukAOutilsReservations"
                       };
                   });
 
