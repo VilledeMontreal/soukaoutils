@@ -56,8 +56,10 @@ namespace WebIdentity
                         OpenIddictConstants.Permissions.Scopes.Email,
                         OpenIddictConstants.Permissions.Scopes.Profile,
                         OpenIddictConstants.Permissions.Scopes.Roles,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + "api",
+                        OpenIddictConstants.Permissions.Prefixes.Scope + "trips",
                         OpenIddictConstants.Permissions.Prefixes.Scope + "roles",
+                        OpenIddictConstants.Permissions.Prefixes.Scope + "reservations",
+                        OpenIddictConstants.Permissions.Prefixes.Scope + "permis",
                         OpenIddictConstants.Permissions.Prefixes.Scope + "role",
 
                         OpenIddictConstants.Permissions.ResponseTypes.Code                    
@@ -96,6 +98,7 @@ namespace WebIdentity
                         OpenIddictConstants.Permissions.Prefixes.Scope + "trips",
                         OpenIddictConstants.Permissions.Prefixes.Scope + "roles",
                         OpenIddictConstants.Permissions.Prefixes.Scope + "reservations",
+                        OpenIddictConstants.Permissions.Prefixes.Scope + "permis",
                         OpenIddictConstants.Permissions.Prefixes.Scope + "role",
                     }/* ,
                     Requirements =
