@@ -1,5 +1,7 @@
 ﻿@model AuthClient.Models.ItemViewModel
-
+@section scripts{
+   <partial name="_ValidationScriptsPartial" />
+}
 <body>
     @if (User?.Identity?.IsAuthenticated ?? false)
     {
@@ -20,13 +22,13 @@
                                         <span class="input-group-text" id="inputGroup-sizing-sm">Title</span>
                                     </div>
                                     <input autocomplete="off" type="text" class="form-control" aria-label="Small"
-                                           aria-describedby="inputGroup-sizing-sm" name="title">
+                                           aria-describedby="inputGroup-sizing-sm" required name="title">
                                 </div>
                             </div>
                             <div>
                                 <select class="mb-3" aria-label="Default select example" style="width: 100%;
-                                border-radius: .2rem; color: #495057; border-color: #495057" name="itemTypeId">
-                                    <option selected style="color: #495057">Item Type Id</option>
+                                border-radius: .2rem; color: #495057; border-color: #495057" required name="itemTypeId">
+                                    <option value="" selected style="color: #495057"></option>
 
                                     @foreach (KeyValuePair<int, String> pair in @Model.ItemTypes)
                                     {
@@ -40,7 +42,7 @@
                                         <span class="input-group-text" id="inputGroup-sizing-sm">Description</span>
                                     </div>
                                     <input autocomplete="off" type="text" class="form-control" aria-label="Small"
-                                           aria-describedby="inputGroup-sizing-sm" name="description">
+                                           aria-describedby="inputGroup-sizing-sm" name="description" required >
                                 </div>
                             </div>
                             <div>
@@ -58,7 +60,7 @@
                                         <span class="input-group-text" id="inputGroup-sizing-sm">Location</span>
                                     </div>
                                     <input autocomplete="off" type="text" class="form-control" aria-label="Small"
-                                           aria-describedby="inputGroup-sizing-sm" name="location">
+                                           aria-describedby="inputGroup-sizing-sm" name="location" required>
                                 </div>
                             </div>
                             <div>
