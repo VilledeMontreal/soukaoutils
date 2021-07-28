@@ -67,12 +67,12 @@ namespace ReservationAPI.Migrations
                         new
                         {
                             Id = 1,
-                            Created = new DateTime(2021, 6, 23, 6, 58, 18, 373, DateTimeKind.Local).AddTicks(6580),
+                            Created = new DateTime(2021, 7, 28, 13, 3, 28, 759, DateTimeKind.Local).AddTicks(8470),
                             DailyFee = 0f,
                             Description = "Nice 2016 model",
                             ItemTypeId = 1,
                             Location = "Pierrefonds",
-                            Modified = new DateTime(2021, 6, 23, 6, 58, 18, 373, DateTimeKind.Local).AddTicks(5545),
+                            Modified = new DateTime(2021, 7, 28, 13, 3, 28, 759, DateTimeKind.Local).AddTicks(6733),
                             OwnerId = 1,
                             Title = "My Ford Focus",
                             Withdrawn = false
@@ -80,12 +80,12 @@ namespace ReservationAPI.Migrations
                         new
                         {
                             Id = 2,
-                            Created = new DateTime(2021, 6, 23, 6, 58, 18, 373, DateTimeKind.Local).AddTicks(7529),
+                            Created = new DateTime(2021, 7, 28, 13, 3, 28, 759, DateTimeKind.Local).AddTicks(9657),
                             DailyFee = 0f,
                             Description = "Old 2011 model",
                             ItemTypeId = 1,
                             Location = "Ile-Bizzard",
-                            Modified = new DateTime(2021, 6, 23, 6, 58, 18, 373, DateTimeKind.Local).AddTicks(7526),
+                            Modified = new DateTime(2021, 7, 28, 13, 3, 28, 759, DateTimeKind.Local).AddTicks(9649),
                             OwnerId = 2,
                             Title = "My Nissan ",
                             Withdrawn = false
@@ -99,9 +99,11 @@ namespace ReservationAPI.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
