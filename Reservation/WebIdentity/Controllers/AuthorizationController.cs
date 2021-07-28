@@ -301,9 +301,19 @@ namespace WebIdentity.Controllers
             // For that, simply restrict the list of scopes before calling SetScopes.
             //principal.SetScopes(request.GetScopes());
             List<string> lstConsentedScopes = new List<string>();
-            foreach(var scp in request.GetParameter("scopeSwitches").GetValueOrDefault().ToString().Split(','))
+            foreach(var scp in request.GetParameter("scopeSwitches").GetValueOrDefault().ToString().Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 lstConsentedScopes.Add(scp.Trim());
+            }
+
+            // Add mandatory OIDC scopes
+            if(!lstConsentedScopes.Contains("profile"))
+            {
+                lstConsentedScopes.Add("profile");
+            }
+            if(!lstConsentedScopes.Contains("openid"))
+            {
+                lstConsentedScopes.Add("openid");
             }
             principal.SetScopes(lstConsentedScopes);
             principal.SetResources(await _scopeManager.ListResourcesAsync(principal.GetScopes()).ToListAsync());

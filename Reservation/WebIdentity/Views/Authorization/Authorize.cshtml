@@ -17,8 +17,11 @@
             @foreach (var item in Model.Scope.Split(" "))
             {
                 <div>
-                    @* @if(@item == "openid" || @item == "profile") *@
-                    @if(Model.GrantedScope.Contains(@item))
+                    @if(@item == "openid" || @item == "profile")
+                    {
+                        <input name="scopeSwitches" type="checkbox" value="@item" checked disabled/>
+                    }
+                    else if(Model.GrantedScope.Contains(@item))
                     {
                         <input name="scopeSwitches" type="checkbox" value="@item" checked />
                     }
