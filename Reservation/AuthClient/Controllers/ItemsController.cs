@@ -35,8 +35,6 @@ namespace AuthClient.Controllers
         // GET: ItemsController
         public async Task<ActionResult> Index()
         {
-            string token = await GetToken();
-
             try
             {
                 return await GetAll();
@@ -52,6 +50,7 @@ namespace AuthClient.Controllers
                         return View("AccessDenied", new AccessDeniedViewModel
                         {
                             Title = "Forbidden",
+                            Message = "Consetement d'accès requis",
                             APIResourceUrl = _configuration["Variables:API_URL"] + "/api/items/getMyId",
                             Exception = httpEx
                         });
@@ -62,6 +61,7 @@ namespace AuthClient.Controllers
                         return View("AccessDenied", new AccessDeniedViewModel
                         {
                             Title = "Unauthorized",
+                            Message = "Consetement d'accès requis",
                             APIResourceUrl = _configuration["Variables:API_URL"] + "/api/items/getMyId",
                             Exception = httpEx
                         });
@@ -141,6 +141,49 @@ namespace AuthClient.Controllers
             var resp = await response.Content.ReadAsStringAsync();
 
             return await Index();
+        }
+
+        public async Task<ActionResult> WithdrawAll()
+        {
+            try
+            {
+                string token = await GetToken();
+
+                using var client = _httpClientFactory.CreateClient();
+                using var request = new HttpRequestMessage(HttpMethod.Get, _configuration["Variables:API_URL"] + "/api/items/withdrawall");
+
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                using var response = await client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                var resp = await response.Content.ReadAsStringAsync();
+
+                return await GetAll();
+            }
+
+            catch (System.Exception ex)
+            {
+                if(ex is HttpRequestException)
+                {
+                    HttpRequestException httpEx = ex as HttpRequestException;
+
+                    if(httpEx.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    {
+                        return View("AccessDenied", new AccessDeniedViewModel
+                        {
+                            Title = "Forbidden",
+                            Message = "Rôle d'admin requis",
+                            APIResourceUrl = _configuration["Variables:API_URL"] + "/api/items/withdrawall",
+                            Exception = httpEx
+                        });
+
+                    }
+                }
+                throw;
+
+            }
+
         }
 
         public async Task<ActionResult> Withdraw(int id)

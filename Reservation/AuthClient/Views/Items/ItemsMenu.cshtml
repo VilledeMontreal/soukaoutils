@@ -132,7 +132,7 @@
                 <tbody>
                     @foreach (var item in @Model.Items)
                     {
-                        <tr>
+                        <tr style="@((bool)item["withdrawn"] ? "background: rgba(0, 0, 0, 0.1)":"")">
                             <td>
                                 @item["id"]
                             </td>
@@ -248,8 +248,8 @@
             }
         </table>
 
-        <form asp-action="Clear">
-            <button class="btn btn-lg btn-danger" type="submit">Supprimer tous les items</button>
+        <form asp-action="WithdrawAll">
+            <button class="btn btn-lg btn-danger" type="submit">Retirer tous les items</button>
         </form>
     }
 

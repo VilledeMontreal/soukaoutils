@@ -15,7 +15,6 @@ using System.Text;
 
 namespace ReservationAPI.Controllers
 {
-    [Authorize(Roles = "Manager,Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ItemsController : ControllerBase
@@ -202,7 +201,26 @@ namespace ReservationAPI.Controllers
                 return Problem(e.InnerException.Message);
             }
         }        
-    
+
+        [HttpGet("withdrawall"), Authorize(Roles = "Admin")]
+        public ActionResult WithdrawAll()
+        {
+            //HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+            try
+            {
+                foreach (var item in aContext.Items)
+                {
+                    item.Withdrawn = true;
+                }
+                aContext.SaveChanges();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Problem(e.InnerException.Message);
+            }
+        }        
+
         //[RequiredScope("Reservations")]
         [HttpGet("getMyId")]
         public ActionResult GetMyId()
