@@ -50,7 +50,7 @@ The migrations populates the database with 3 pre-configured users:
 
 `joe@soukaoutils.com`        No specific roles 
 
-Password is *P@ssw0rd*
+Password is `P@ssw0rd`
 
 ### License
 
@@ -101,6 +101,23 @@ dotnet ef migrations add initial_migration
 dotnet ef database update
 
 ```
+### Essais
+Démarrer les 3 composants:
+```
+https://localhost:5001/   -- Serveur d'identité unique
+https://localhost:5002/   -- Application cliente
+https://localhost:6001/   -- Serveur de ressources (Open Data)
+```
+Commencer par la création d'un nouveau compte utilisateur. Il est possible d'utiliser un compte d'un autre fournisseur OIDC (Google, Azure sont déjà configurés).
+Les 3 utilisateurs suivants sont préconfigurés:
+
+`admin@soukaoutils.com`       Rôle *Admin*
+
+`manager@soukaoutils.com`     Rôle *Manager*
+
+`joe@soukaoutils.com`        Pas de rôle en particulier
+
+Utiliser le mot de passe `P@ssw0rd`
 
 ### Contribuer
 
