@@ -34,6 +34,23 @@ dotnet ef migrations add initial_migration
 dotnet ef database update
 
 ```
+### Testing
+Run all 3 components in your environment:
+```
+https://localhost:5001/   -- Identiy Server
+https://localhost:5002/   -- Auth Client (App)
+https://localhost:6001/   -- Resource Server (Open Data)
+```
+Then register a new account on the Identity server itself or using and external (Google, Azure for now, more could be added).
+The migrations populates the database with 3 pre-configured users:
+
+`admin@soukaoutils.com`       A user with an *Admin* role 
+
+`manager@soukaoutils.com`     A user with an *Manager* role 
+
+`joe@soukaoutils.com`        No specific roles 
+
+Password is `P@ssw0rd`
 
 ### License
 
@@ -84,6 +101,23 @@ dotnet ef migrations add initial_migration
 dotnet ef database update
 
 ```
+### Essais
+Démarrer les 3 composants:
+```
+https://localhost:5001/   -- Serveur d'identité unique
+https://localhost:5002/   -- Application cliente
+https://localhost:6001/   -- Serveur de ressources (Open Data)
+```
+Commencer par la création d'un nouveau compte utilisateur. Il est possible d'utiliser un compte d'un autre fournisseur OIDC (Google, Azure sont déjà configurés).
+Les 3 utilisateurs suivants sont préconfigurés:
+
+`admin@soukaoutils.com`       Rôle *Admin*
+
+`manager@soukaoutils.com`     Rôle *Manager*
+
+`joe@soukaoutils.com`        Pas de rôle en particulier
+
+Utiliser le mot de passe `P@ssw0rd`
 
 ### Contribuer
 
