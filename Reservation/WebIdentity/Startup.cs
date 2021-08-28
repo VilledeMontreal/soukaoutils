@@ -80,10 +80,10 @@ namespace WebIdentity
                     options.ClientId = Configuration["AzureSoukAOutilsApp:ClientID"];
                     options.ClientSecret = Configuration["AzureSoukAOutilsApp:ClientSecret"];
  */
-                    options.Authority = Configuration["Variables:VDM_Authority"];
+                    options.Authority = Configuration["VDMTLSoukAOutilsApp:Authority"];
 
-                    options.ClientId = "@!5BDE.4BEB.9FC4.BBCB!0001!28A8.643E!0008!2A49.230F.13D2.B1CA";
-                    options.ClientSecret = "@!5BDE.4BEB.9FC4"; 
+                    options.ClientId = Configuration["VDMTLSoukAOutilsApp:ClientID"];
+                    options.ClientSecret = Configuration["VDMTLSoukAOutilsApp:ClientSecret"]; 
                     //options.ResponseType = "code";
                     //options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
