@@ -90,7 +90,7 @@ namespace WebIdentity.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 
-                var cEmail = info.Principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+                var cEmail = info.Principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email");
                 if(cEmail == null)
                 {
                     cEmail = info.Principal.Claims.FirstOrDefault(c => c.Type == "preferred_username" ); // Microsoft
@@ -136,7 +136,14 @@ namespace WebIdentity.Areas.Identity.Pages.Account
                 {
                     Input = new InputModel
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                        Email = info.Principal.FindFirstValue(ClaimTypes.Email )
+                    };
+                }
+                else if (info.Principal.HasClaim(c => c.Type == "email"))
+                {
+                    Input = new InputModel
+                    {
+                        Email = info.Principal.FindFirstValue("email")
                     };
                 }
                 return Page();

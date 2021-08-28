@@ -21,6 +21,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using WebIdentity.Services;
+using System.Net.Http;
 
 namespace WebIdentity
 {
@@ -74,14 +75,43 @@ namespace WebIdentity
                  })
                 .AddOpenIdConnect("oidc", "Identité Ville", options =>
                 {
+                   /* 
+                    options.Authority = "https://login.microsoftonline.com/organizations/v2.0/";
+                    options.ClientId = Configuration["AzureSoukAOutilsApp:ClientID"];
+                    options.ClientSecret = Configuration["AzureSoukAOutilsApp:ClientSecret"];
+ */
                     options.Authority = Configuration["Variables:VDM_Authority"];
 
-                    options.ClientId = "mvc";
-                    options.ClientSecret = "secret";
-                    options.ResponseType = "code";
+                    options.ClientId = "@!5BDE.4BEB.9FC4.BBCB!0001!28A8.643E!0008!2A49.230F.13D2.B1CA";
+                    options.ClientSecret = "@!5BDE.4BEB.9FC4"; 
+                    //options.ResponseType = "code";
+                    //options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
+                    options.Scope.Add("profile");
+                    options.Scope.Add("openid");
+                    options.Scope.Add("email");
+                    options.RequireHttpsMetadata = false;
+                    HttpClientHandler handler = new HttpClientHandler();
+                    handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+                    options.BackchannelHttpHandler = handler;
+                    options.GetClaimsFromUserInfoEndpoint = true;
                     //options.Resource.
 
                     options.SaveTokens = true;
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = false
+                    };
+
+                    options.Events = new OpenIdConnectEvents 
+                    {
+                        OnRedirectToIdentityProvider = context => { 
+                            //context.ProtocolMessage.SetParameter("audience","https://my/api");
+                            return Task.CompletedTask;
+
+                        }
+                    };
+                    /*
                     options.Scope.Add("api1");
                     options.Scope.Add("email");
                     //options.Scope.Add("role");
@@ -89,7 +119,8 @@ namespace WebIdentity
                     options.Scope.Add("idRoles"); // this is required to get the role in the id token [Authorize(Roles=xxx)] and IsInRole in the API side which only have access to the access token
                     options.ClaimActions.MapUniqueJsonKey("role", "role");
                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters {RoleClaimType = "role"};
-
+                    
+                    
                     options.Events = new OpenIdConnectEvents 
                     {
                         OnRedirectToIdentityProvider = context => { 
@@ -98,7 +129,8 @@ namespace WebIdentity
 
                         }
                     };
-
+                    */
+                    
                 });                
             
             services.AddDbContext<ApplicationDbContext>(options =>
