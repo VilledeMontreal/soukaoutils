@@ -52,6 +52,24 @@ The migrations populates the database with 3 pre-configured users:
 
 Password is `P@ssw0rd`
 
+### Adding OIDC authentication providers
+You can add other OIDC providers. For that end, you will have to register an app with that provider first then inject the OIDC provider's service using the ClientId and ClientSecret as follows:
+```
+                .AddOpenIdConnect("oidc", "Identité Ville MTL", options =>
+                {
+                    options.Authority = <Authority URL>;
+
+                    options.ClientId = <ClientID>;
+                    options.ClientSecret = <ClientSecret>; 
+                    options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
+                    // Required scopes
+                    options.Scope.Add("profile");
+                    options.Scope.Add("openid");
+                    options.Scope.Add("email");
+                    ....
+
+```
+
 ### License
 
 The source code of this project is distributed under the [MIT License](LICENSE).
@@ -118,6 +136,24 @@ Les 3 utilisateurs suivants sont préconfigurés:
 `joe@soukaoutils.com`        Pas de rôle en particulier
 
 Utiliser le mot de passe `P@ssw0rd`
+
+### Ajouter un fournisseur d'authentification OIDC
+Cette POC démontre aussi comment ajouter un nouveau fournisseur d'identité qui implémente OIDC. Il faut commencer par se procurer une application avec ce fournisseur. Ensuite, injecter le service d'authentification en utilisant le ClientId et le ClientSecret:
+```
+                .AddOpenIdConnect("oidc", "Identité Ville MTL", options =>
+                {
+                    options.Authority = <Authority URL>;
+
+                    options.ClientId = <ClientID>;
+                    options.ClientSecret = <ClientSecret>; 
+                    options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
+                    // Required scopes
+                    options.Scope.Add("profile");
+                    options.Scope.Add("openid");
+                    options.Scope.Add("email");
+                    ....
+
+```
 
 ### Contribuer
 
